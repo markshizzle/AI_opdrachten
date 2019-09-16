@@ -5,13 +5,6 @@ forbiddens=(set((goat,cabbage)), set((wolf,goat)))
 # Begin state
 state=((set((farmer,goat,cabbage,wolf)), set()),"")
 
-def dfs(state, visited):
-    if checkState(splitStates) is False:
-        return False
-    if isGoal(splitStates):
-        return True
-    visited.append(state)
-
 # Defines when the desired goal is reached
 def isGoal(state):
     left=state[0]
