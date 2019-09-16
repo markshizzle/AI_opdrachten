@@ -1,9 +1,3 @@
-# Defines the needed variables
-farmer,goat,cabbage,wolf=("farmer","goat","cabbage","wolf")
-takeovers = (cabbage,goat,wolf,None)
-forbiddens=(set((goat,cabbage)), set((wolf,goat)))
-# Begin state
-state=((set((farmer,goat,cabbage,wolf)), set()),"")
 
 # Defines when the desired goal is reached
 def isGoal(state):
@@ -61,6 +55,11 @@ def generateSolutions(state,level=0):
         previousstates.append(child[0])
         generateSolutions(child,level+1)
 
+# Defines the variables
+farmer,goat,cabbage,wolf=("farmer","goat","cabbage","wolf")
+takeovers = (cabbage,goat,wolf,None)
+forbiddens=(set((goat,cabbage)), set((wolf,goat)))
+# Begin state
+state=((set((farmer,goat,cabbage,wolf)), set()),"")
 previousstates=[state[0]]
-solutionstack=[]
 generateSolutions(state)
