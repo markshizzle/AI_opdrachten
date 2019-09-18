@@ -14,6 +14,8 @@ def getChildren(state):
 
 # Function to ship over the farmer with an item of choice or nothing
 def shipOver(state, item):
+    global level
+    level += 1
     left,right=[set(x) for x in state[0]]
     if farmer in left:
         src,dst=left,right
@@ -40,12 +42,12 @@ def checkState(state):
                 if shore.issuperset(forbidden):
                     return True
     return False
-def printState(state,level):
+def printState(state):
     left,right=state[0]
-    print (state[1], "\n",level,", ".join(left)," | ",", ".join(right), "\n")
+    print (state[1], "\n",", ".join(left)," | ",", ".join(right), "\n")
 
-def generateSolutions(state,level=0):
-    printState(state,level)
+def generateSolutions(state):
+    printState(state)
     childs=getChildren(state)
     for child in childs:
         if checkState(child):
@@ -53,13 +55,15 @@ def generateSolutions(state,level=0):
         if child[0] in previousstates:
             continue
         previousstates.append(child[0])
-        generateSolutions(child,level+1)
+        generateSolutions(child)
 
 # Defines the variables
+level = 0
 farmer,goat,cabbage,wolf=("farmer","goat","cabbage","wolf")
-takeovers = (cabbage,goat,wolf,None)
+takeovers = (cabbage,goat,wolf, None)
 forbiddens=(set((goat,cabbage)), set((wolf,goat)))
 # Begin state
 state=((set((farmer,goat,cabbage,wolf)), set()),"")
 previousstates=[state[0]]
 generateSolutions(state)
+print("It took this many steps: ", level)
