@@ -22,7 +22,6 @@ unit_list = ([cross(r, cols) for r in rows] +  # 9 rows
 units = dict((s, [u for u in unit_list if s in u]) for s in cells)
 peers = dict((s, set(sum(units[s], [])) - set([s])) for s in cells)
 
-
 def test():
     # a set of tests that must pass
     assert len(cells) == 81
@@ -69,14 +68,6 @@ def parse_string_to_dict(grid_string):
     return dict(zip(cells, char_list2))
 
 
-def no_conflict(grid, c, v):
-    # check if assignment is possible: value v not a value of a peer
-    for p in peers[c]:
-        if grid[p] == v:
-            return False  # conflict
-    return True
-
-
 def solve(grid):
     # If 'grid' is false stop solving -> it failed
     if grid is False:
@@ -89,38 +80,39 @@ def solve(grid):
     return some(solve(set_numbers(grid.copy(), cell, value)) for value in grid[cell])
 
 
-def set_numbers(numbers, number, spot):
-    other_numbers = numbers[number].replace(spot, '')
-    if all(eliminate(numbers, number, spot2) for spot2 in other_numbers):
-        return numbers
+def set_numbers(grid, spot, number):
+    other_grid = grid[spot].replace(number, '')
+    if all(eliminate(grid, spot, spot2) for spot2 in other_grid):
+        return grid
     else:
         return False
 
 
-def eliminate(numbers, number, spot):
-    if spot not in numbers[number]:
-        return numbers
-    numbers[number] = numbers[number].replace(spot,'')
-    if len(numbers[number]) == 0:
-        return False
-    elif len(numbers[number]) == 1:
-        if not all(eliminate(numbers, number2, numbers[number]) for number2 in peers[number]):
-            return False
-    for u in units[number]:
-        dplaces = [number for number in u if spot in numbers[number]]
+def eliminate(grid, spot, number):
+    # Eliminate numbers from the list 'numbers'.
+    # It returns 'numbers', except when there is an error then it returns False
+    if number not in grid[spot]:
+        return grid # Error: Already removed from numbers
+    grid[spot] = grid[spot].replace(number,'') # delete the number in the spot of the grid
+    if len(grid[spot]) == 0:
+        return False # Error: Removed last value in numbers
+    elif len(grid[spot]) == 1:
+        if not all(eliminate(grid, number2, grid[spot]) for number2 in peers[spot]):
+            return False # Return False if it has a constraint with peers
+    for u in units[spot]:
+        dplaces = [spot for spot in u if number in grid[spot]]
         if len(dplaces) == 0:
-            return False ## Contradiction: no place for this value
+            return False
         elif len(dplaces) == 1:
-            # d can only be in one place in unit; assign it there
-            if not set_numbers(numbers, dplaces[0], spot):
+            if not set_numbers(grid, dplaces[0], number):
                 return False
-    return numbers
+    return grid
 
-
-def some(seq):
-    for e in seq:
-        if e:
-            return e
+def some(a):
+    # Return an element that is true
+    for number in a:
+        if number:
+            return number
     return False
 
 # minimum nr of clues for a unique solution is 17
